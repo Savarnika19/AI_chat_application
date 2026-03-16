@@ -1,0 +1,62 @@
+--- Starting Task Extraction Test ---
+(node:10428) [DEP0170] DeprecationWarning: The URL mongodb://savarnikajalla_db_user:XxS0GtLvPDlKNoiY@ac-xh3eskj-shard-00-00.rfsdk86.mongodb.net:27017,ac-xh3eskj-shard-00-01.rfsdk86.mongodb.net:27017,ac-xh3eskj-shard-00-02.rfsdk86.mongodb.net:27017/?authSource=admin&replicaSet=atlas-bpg503-shard-0&appName=Cluster0&ssl=true is invalid. Future versions of Node.js will throw an error.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:10428) DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+DB Connected
+Task Created: report high
+[FAIL] English Trigger (Expected >= 1, Found 0)
+Current DB state: [ { title: 'report', ai: undefined, asgn: undefined } ]
+Task Created: repu report high
+[FAIL] Telugu Trigger (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined }
+]
+Task Created: project repu high
+[FAIL] Mixed Phrase (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined },
+  { title: 'project repu', ai: undefined, asgn: undefined }
+]
+TaskExtractionService Error: Deadline validation failed: title: Path `title` is required., dueAt: Path `dueAt` is required.
+[FAIL] Urgency context (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined },
+  { title: 'project repu', ai: undefined, asgn: undefined }
+]
+Duplicate Task Ignored: report
+TaskExtractionService Error: Deadline validation failed: title: Path `title` is required.
+[FAIL] Multiple Tasks via Split (Report) (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined },
+  { title: 'project repu', ai: undefined, asgn: undefined }
+]
+[FAIL] Multiple Tasks via Split (Deploy) (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined },
+  { title: 'project repu', ai: undefined, asgn: undefined }
+]
+Task Created: ravi will the code high
+[FAIL] Responsibility assignment (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined },
+  { title: 'project repu', ai: undefined, asgn: undefined },
+  { title: 'ravi will the code', ai: undefined, asgn: undefined }
+]
+Task Created: meeting ellundi morning high
+[FAIL] Date-based task candidate (>3 words, real date) (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: undefined, asgn: undefined },
+  { title: 'repu report', ai: undefined, asgn: undefined },
+  { title: 'project repu', ai: undefined, asgn: undefined },
+  { title: 'ravi will the code', ai: undefined, asgn: undefined },
+  { title: 'meeting ellundi morning', ai: undefined, asgn: undefined }
+]
+
+Cleaning up test data...
+Done.

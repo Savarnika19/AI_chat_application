@@ -1,0 +1,215 @@
+﻿--- Starting Task Extraction Test ---
+node : (node:22844) 
+[DEP0170] 
+DeprecationWarning: 
+The URL mongodb://savar
+nikajalla_db_user:XxS0G
+tLvPDlKNoiY@ac-xh3eskj-
+shard-00-01.rfsdk86.mon
+godb.net:27017,ac-xh3es
+kj-shard-00-02.rfsdk86.
+mongodb.net:27017,ac-xh
+3eskj-shard-00-00.rfsdk
+86.mongodb.net:27017/?a
+uthSource=admin&replica
+Set=atlas-bpg503-shard-
+0&appName=Cluster0&ssl=
+true is invalid. 
+Future versions of 
+Node.js will throw an 
+error.
+At line:1 char:1
++ node backend/testTask
+Extraction.js > 
+cleanOutput.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ((node:22844)    
+ [D...throw an erro    
+r.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+(Use `node 
+--trace-deprecation 
+...` to show where the 
+warning was created)
+(node:22844) 
+DeprecationWarning: 
+collection.ensureIndex 
+is deprecated. Use 
+createIndexes instead.
+DB Connected
+SEGMENT DETECTED: Submit report tomorrow
+DATE PARSED: 2026-03-17T12:38:42.257Z
+TASK CANDIDATE: Submit report tomorrow
+TASK CREATED: report
+[PASS] English Trigger
+SEGMENT DETECTED: repu report submit cheyali
+DATE PARSED: 2026-03-17T12:38:43.385Z
+TASK CANDIDATE: repu report submit cheyali
+TASK CREATED: repu report
+[PASS] Telugu Trigger
+SEGMENT DETECTED: project repu complete cheyali
+DATE PARSED: 2026-03-17T12:38:44.707Z
+TASK CANDIDATE: project repu complete cheyali
+TASK CREATED: project repu
+[PASS] Mixed Phrase
+SEGMENT DETECTED: submit asap
+TASK CANDIDATE: submit asap
+TASK CREATED: submit asap
+[PASS] Urgency context
+SEGMENT DETECTED: submit final report tomorrow
+DATE PARSED: 2026-03-17T12:38:46.878Z
+TASK CANDIDATE: submit final report tomorrow
+TASK CREATED: final report
+SEGMENT DETECTED: deploy frontend friday
+DATE PARSED: 2026-03-13T06:30:00.000Z
+TASK CANDIDATE: deploy frontend friday
+TASK CREATED: frontend
+[PASS] Multiple Tasks via Split (Report)
+[PASS] Multiple Tasks via Split (Deploy)
+SEGMENT DETECTED: ravi will review the code tomorrow
+DATE PARSED: 2026-03-17T12:38:49.051Z
+TASK CANDIDATE: ravi will review the code tomorrow
+TASK CREATED: ravi will the code
+[PASS] Responsibility assignment
+SEGMENT DETECTED: meeting ellundi morning
+DATE PARSED: 2026-03-17T00:30:00.000Z
+TASK CANDIDATE: meeting ellundi morning
+TASK CREATED: meeting ellundi morning
+[PASS] Date-based task candidate (>3 words, real date)
+SEGMENT DETECTED: submit report tomorrow
+DATE PARSED: 2026-03-17T12:38:51.297Z
+TASK CANDIDATE: submit report tomorrow
+Duplicate Task Ignored: report
+SEGMENT DETECTED: deploy backend friday
+DATE PARSED: 2026-03-13T06:30:00.000Z
+TASK CANDIDATE: deploy backend friday
+TASK CREATED: backend
+[FAIL] Conjunction Split (Report) (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: false, asgn: null },
+  { title: 'repu report', ai: false, asgn: null },
+  { title: 'project repu', ai: false, asgn: null },
+  { title: 'submit asap', ai: false, asgn: null },
+  { title: 'final report', ai: false, asgn: null },
+  { title: 'frontend', ai: false, asgn: null },
+  {
+    title: 'ravi will the code',
+    ai: false,
+    asgn: 69b7f9d1d88845593ce7e700
+  },
+  { title: 'meeting ellundi morning', ai: false, asgn: null },
+  { title: 'backend', ai: false, asgn: null }
+]
+[PASS] Conjunction Split (Deploy)
+SEGMENT DETECTED: repu project report submit cheyali
+DATE PARSED: 2026-03-17T12:38:53.467Z
+TASK CANDIDATE: repu project report submit cheyali
+TASK CREATED: repu project report
+SEGMENT DETECTED: project ellundi morning complete cheyali
+DATE PARSED: 2026-03-17T00:30:00.000Z
+TASK CANDIDATE: project ellundi morning complete cheyali
+TASK CREATED: project ellundi morning
+SEGMENT DETECTED: Ravi will review the code tomorrow evening
+DATE PARSED: 2026-03-17T14:30:00.000Z
+TASK CANDIDATE: Ravi will review the code tomorrow evening
+TASK CREATED: Ravi will the code
+SEGMENT DETECTED: submit report tomorrow
+DATE PARSED: 2026-03-17T12:38:53.665Z
+TASK CANDIDATE: submit report tomorrow
+Duplicate Task Ignored: report
+SEGMENT DETECTED: deploy backend friday
+DATE PARSED: 2026-03-13T06:30:00.000Z
+TASK CANDIDATE: deploy backend friday
+Duplicate Task Ignored: backend
+SEGMENT DETECTED: Sahithi urgent please submit the project files asap
+TASK CANDIDATE: Sahithi urgent please submit the project files asap
+TASK CREATED: Sahithi the project files
+[PASS] Multiline Extract 1
+[PASS] Multiline Extract 2
+[PASS] Multiline Extract 3
+[FAIL] Multiline Extract 4 (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: false, asgn: null },
+  { title: 'repu report', ai: false, asgn: null },
+  { title: 'project repu', ai: false, asgn: null },
+  { title: 'submit asap', ai: false, asgn: null },
+  { title: 'final report', ai: false, asgn: null },
+  { title: 'frontend', ai: false, asgn: null },
+  {
+    title: 'ravi will the code',
+    ai: false,
+    asgn: 69b7f9d1d88845593ce7e700
+  },
+  { title: 'meeting ellundi morning', ai: false, asgn: null },
+  { title: 'backend', ai: false, asgn: null },
+  { title: 'repu project report', ai: false, asgn: null },
+  { title: 'project ellundi morning', ai: false, asgn: null },
+  {
+    title: 'Ravi will the code',
+    ai: false,
+    asgn: 69b7f9d1d88845593ce7e700
+  },
+  { title: 'Sahithi the project files', ai: false, asgn: null }
+]
+[PASS] Multiline Extract 5
+[PASS] Multiline Extract 6
+SEGMENT DETECTED: submit report tomorrow
+DATE PARSED: 2026-03-17T12:38:59.993Z
+TASK CANDIDATE: submit report tomorrow
+Duplicate Task Ignored: report
+SEGMENT DETECTED: deploy backend friday
+DATE PARSED: 2026-03-13T06:30:00.000Z
+TASK CANDIDATE: deploy backend friday
+Duplicate Task Ignored: backend
+SEGMENT DETECTED: prepare presentation sunday
+DATE PARSED: 2026-03-15T06:30:00.000Z
+TASK CANDIDATE: prepare presentation sunday
+TASK CREATED: presentation
+[FAIL] Three Tasks 1 (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: false, asgn: null },
+  { title: 'repu report', ai: false, asgn: null },
+  { title: 'project repu', ai: false, asgn: null },
+  { title: 'submit asap', ai: false, asgn: null },
+  { title: 'final report', ai: false, asgn: null },
+  { title: 'frontend', ai: false, asgn: null },
+  {
+    title: 'ravi will the code',
+    ai: false,
+    asgn: 69b7f9d1d88845593ce7e700
+  },
+  { title: 'meeting ellundi morning', ai: false, asgn: null },
+  { title: 'backend', ai: false, asgn: null },
+  { title: 'repu project report', ai: false, asgn: null },
+  { title: 'project ellundi morning', ai: false, asgn: null },
+  {
+    title: 'Ravi will the code',
+    ai: false,
+    asgn: 69b7f9d1d88845593ce7e700
+  },
+  { title: 'Sahithi the project files', ai: false, asgn: null },
+  { title: 'presentation', ai: false, asgn: null }
+]
+[PASS] Three Tasks 2
+[PASS] Three Tasks 3
+SEGMENT DETECTED: prepare slides tomorrow
+DATE PARSED: 2026-03-17T12:39:03.235Z
+TASK CANDIDATE: prepare slides tomorrow
+TASK CREATED: slides
+SEGMENT DETECTED: Ravi will send report friday
+DATE PARSED: 2026-03-13T06:30:00.000Z
+TASK CANDIDATE: Ravi will send report friday
+TASK CREATED: Ravi will report
+[PASS] Resp Task 1
+[PASS] Resp Task 2
+
+Cleaning up test data...
+Done.

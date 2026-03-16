@@ -1,0 +1,24 @@
+--- Starting Task Extraction Test ---
+(node:17136) [DEP0170] DeprecationWarning: The URL mongodb://savarnikajalla_db_user:XxS0GtLvPDlKNoiY@ac-xh3eskj-shard-00-01.rfsdk86.mongodb.net:27017,ac-xh3eskj-shard-00-00.rfsdk86.mongodb.net:27017,ac-xh3eskj-shard-00-02.rfsdk86.mongodb.net:27017/?authSource=admin&replicaSet=atlas-bpg503-shard-0&appName=Cluster0&ssl=true is invalid. Future versions of Node.js will throw an error.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:17136) DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+DB Connected
+Task Created: report high
+[PASS] English Trigger
+Task Created: repu report high
+[PASS] Telugu Trigger
+Task Created: project repu high
+[PASS] Mixed Phrase
+Task Created: submit asap urgent
+[PASS] Urgency context
+Task Created: final report high
+Task Created: frontend high
+[PASS] Multiple Tasks via Split (Report)
+[PASS] Multiple Tasks via Split (Deploy)
+Task Created: ravi will the code high
+[PASS] Responsibility assignment
+Task Created: meeting ellundi morning high
+[PASS] Date-based task candidate (>3 words, real date)
+
+Cleaning up test data...
+Done.

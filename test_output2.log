@@ -1,0 +1,39 @@
+--- Starting Task Extraction Test ---
+(node:15824) [DEP0170] DeprecationWarning: The URL mongodb://savarnikajalla_db_user:XxS0GtLvPDlKNoiY@ac-xh3eskj-shard-00-01.rfsdk86.mongodb.net:27017,ac-xh3eskj-shard-00-02.rfsdk86.mongodb.net:27017,ac-xh3eskj-shard-00-00.rfsdk86.mongodb.net:27017/?authSource=admin&replicaSet=atlas-bpg503-shard-0&appName=Cluster0&ssl=true is invalid. Future versions of Node.js will throw an error.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:15824) DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+DB Connected
+Task Created: report high
+[PASS] English Trigger
+Task Created: repu report high
+[PASS] Telugu Trigger
+Task Created: project repu high
+[PASS] Mixed Phrase
+TaskExtractionService Error: Deadline validation failed: title: Path `title` is required.
+[FAIL] Urgency context (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: false, asgn: null },
+  { title: 'repu report', ai: false, asgn: null },
+  { title: 'project repu', ai: false, asgn: null }
+]
+Duplicate Task Ignored: report
+TaskExtractionService Error: Deadline validation failed: title: Path `title` is required.
+[FAIL] Multiple Tasks via Split (Report) (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: false, asgn: null },
+  { title: 'repu report', ai: false, asgn: null },
+  { title: 'project repu', ai: false, asgn: null }
+]
+[FAIL] Multiple Tasks via Split (Deploy) (Expected >= 1, Found 0)
+Current DB state: [
+  { title: 'report', ai: false, asgn: null },
+  { title: 'repu report', ai: false, asgn: null },
+  { title: 'project repu', ai: false, asgn: null }
+]
+Task Created: ravi will the code high
+[PASS] Responsibility assignment
+Task Created: meeting ellundi morning high
+[PASS] Date-based task candidate (>3 words, real date)
+
+Cleaning up test data...
+Done.
