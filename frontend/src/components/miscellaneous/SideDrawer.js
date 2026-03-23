@@ -20,7 +20,7 @@ import { Tooltip } from "@chakra-ui/tooltip";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/avatar";
 import { useHistory } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "@chakra-ui/toast";
 import ChatLoading from "../ChatLoading";
@@ -42,9 +42,27 @@ function SideDrawer() {
     user,
     notification,
     setNotification,
+    dbNotifications,
+    setDbNotifications,
     chats,
     setChats,
   } = ChatState();
+
+  useEffect(() => {
+    const fetchDbNotifications = async () => {
+      try {
+        const config = { headers: { Authorization: `Bearer ${user.token}` } };
+        const { data } = await axios.get("/api/notifications", config);
+        // Only keep unread notifications
+        setDbNotifications(data.filter((n) => !n.isRead));
+      } catch (error) {
+        console.error("Failed to fetch expense notifications:", error);
+      }
+    };
+    if (user) {
+      fetchDbNotifications();
+    }
+  }, [user]);
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -148,6 +166,12 @@ function SideDrawer() {
           </Button>
         </Tooltip>
 
+        <Tooltip label="Expense Dashboard" hasArrow placement="bottom">
+          <Button variant="ghost" onClick={() => history.push("/expenses")}>
+            <Text fontSize="2xl">💸</Text>
+          </Button>
+        </Tooltip>
+
         <Text fontSize="2xl" fontFamily="Work sans">
           Talk-A-Tive
         </Text>
@@ -156,7 +180,7 @@ function SideDrawer() {
             <MenuButton p={1}>
               <Box position="relative" display="inline-block">
                 <BellIcon fontSize="2xl" m={1} />
-                {notification.length > 0 && (
+                {(notification.length + dbNotifications.length) > 0 && (
                   <Box
                     color="white"
                     bg="red"
@@ -171,24 +195,56 @@ function SideDrawer() {
                     alignItems="center"
                     justifyContent="center"
                   >
-                    {notification.length}
+                    {notification.length + dbNotifications.length}
                   </Box>
                 )}
               </Box>
             </MenuButton>
             <MenuList pl={2}>
-              {!notification.length && "No New Messages"}
+              {!notification.length && !dbNotifications.length && "No Notifications"}
               {notification.map((notif) => (
                 <MenuItem
                   key={notif._id}
                   onClick={() => {
-                    setSelectedChat(notif.chat);
-                    setNotification(notification.filter((n) => n !== notif));
+                    if (notif.type === "expense_created" || notif.type === "expense_settlement") {
+                      const groupId = notif.expenseGroup?._id || notif.expenseGroup;
+                      history.push(`/expenses/${groupId}`);
+                    } else if (notif.chat) {
+                      setSelectedChat(notif.chat);
+                    }
+                    setNotification(notification.filter((n) => n._id !== notif._id));
                   }}
                 >
-                  {notif.chat.isGroupChat
-                    ? `New Message in ${notif.chat.chatName}`
-                    : `New Message from ${getSender(user, notif.chat.users)}`}
+                  {notif.type && notif.type.startsWith("expense_") ? (
+                    <><Text as="span" fontWeight="bold" mr={2}>💸</Text> {notif.message}</>
+                  ) : notif.chat?.isGroupChat ? (
+                    `New Message in ${notif.chat.chatName}`
+                  ) : (
+                    `New Message from ${getSender(user, notif.chat?.users)}`
+                  )}
+                </MenuItem>
+              ))}
+              {dbNotifications.map((notif) => (
+                <MenuItem
+                  key={notif._id}
+                  onClick={async () => {
+                    try {
+                      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+                      await axios.patch(`/api/notifications/${notif._id}`, {}, config);
+                      setDbNotifications(dbNotifications.filter((n) => n._id !== notif._id));
+                      setNotification(notification.filter((n) => n._id !== notif._id));
+                      
+                      // Handling logic for opening Expense View
+                      if (notif.type === "expense_created" || notif.type === "expense_settlement") {
+                        const groupId = notif.expenseGroup?._id || notif.expenseGroup;
+                        history.push(`/expenses/${groupId}`);
+                      }
+                    } catch (error) {
+                      console.log(error);
+                    }
+                  }}
+                >
+                  <Text as="span" fontWeight="bold" mr={2}>💸</Text> {notif.message}
                 </MenuItem>
               ))}
             </MenuList>

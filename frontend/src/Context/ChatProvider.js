@@ -7,6 +7,7 @@ const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState();
   const [user, setUser] = useState();
   const [notification, setNotification] = useState([]);
+  const [dbNotifications, setDbNotifications] = useState([]);
   const [chats, setChats] = useState();
   const [scrollToMessage, setScrollToMessage] = useState();
 
@@ -29,6 +30,8 @@ const ChatProvider = ({ children }) => {
         setUser,
         notification,
         setNotification,
+        dbNotifications,
+        setDbNotifications,
         chats,
         setChats,
         scrollToMessage,

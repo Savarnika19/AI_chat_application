@@ -46,7 +46,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  const { selectedChat, setSelectedChat, user, notification, setNotification, scrollToMessage, setScrollToMessage } =
+  const { selectedChat, setSelectedChat, user, notification, setNotification, dbNotifications, setDbNotifications, scrollToMessage, setScrollToMessage } =
     ChatState();
 
   const fetchMessages = async () => {
@@ -147,10 +147,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     };
 
+    const handleNotificationReceived = (newNotif) => {
+      if (!dbNotifications.some(n => n._id === newNotif._id)) {
+        setDbNotifications([newNotif, ...dbNotifications]);
+      }
+    };
+
     socket.on("message recieved", handleMessageReceived);
+    socket.on("notification recieved", handleNotificationReceived);
 
     return () => {
       socket.off("message recieved", handleMessageReceived);
+      socket.off("notification recieved", handleNotificationReceived);
     };
   });
 

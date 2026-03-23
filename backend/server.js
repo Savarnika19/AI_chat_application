@@ -5,6 +5,8 @@ const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const deadlineRoutes = require("./routes/deadlineRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const path = require("path");
 
@@ -22,6 +24,8 @@ app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/deadlines", deadlineRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // --------------------------deployment------------------------------
 
@@ -84,6 +88,10 @@ io.on("connection", (socket) => {
 
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
+  });
+
+  socket.on("new notification", (notificationData) => {
+    socket.in(notificationData.user).emit("notification recieved", notificationData);
   });
 
   socket.off("setup", () => {
