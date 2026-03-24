@@ -10,16 +10,30 @@ let model = null;
 if (process.env.GEMINI_API_KEY) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     } catch (e) {
         console.error("Gemini Init Error in TaskExtraction:", e.message);
     }
 }
 
 // Triggers
-const STRONG_TRIGGERS = ["submit", "complete", "finish", "deploy", "upload", "send", "review", "update", "deliver", "prepare", "ivvali", "cheyali", "cheyyali", "pampali"];
+const STRONG_TRIGGERS = ["submit", "prepare", "complete", "finish", "deploy", "upload", "send", "review", "update", "deliver", "cheyali", "cheyyali", "ivvali", "pampali"];
 const SOFT_TRIGGERS = ["please", "expected to", "kindly", "remember to"];
 const URGENCY_KW = ["urgent", "asap", "immediately", "priority"];
+const IGNORE_PHRASES = ["see you", "maybe", "ok", "yes", "hi", "hello", "thanks", "thank you", "good morning", "good evening", "good night", "bye", "see ya", "take care", "how are you", "what's up", "nice", "great", "awesome", "cool"];
+
+const CLEANUP_PHRASES = [
+    "we also planned to", "we plan to", "we need to", "i will", "we will", "he will", "she will", 
+    "they will", "you need to", "you should", "we should", "i should", "is expected to",
+    "please make sure to", "please ensure", "please", "can you", "could you", "make sure to"
+];
+
+const preNormalizeMessage = (text) => {
+    let normalized = text;
+    normalized = normalized.replace(/\brepu\b/gi, "tomorrow");
+    normalized = normalized.replace(/\bellundi\b/gi, "day after tomorrow");
+    return normalized;
+};
 
 // Service
 const TaskExtractionService = {
@@ -31,64 +45,61 @@ const TaskExtractionService = {
         try {
             if (!message || !message.content || !chatId) return;
 
-            // 1. Segmentation
-            const segments = splitMessageIntoSegments(message.content);
+            // 1. Multilingual Normalization FIRST
+            const preNormalizedContent = preNormalizeMessage(message.content);
+
+            // 2. Safe Segmentation
+            const segments = safeSegment(preNormalizedContent);
 
             for (const segment of segments) {
                 console.log("SEGMENT DETECTED:", segment);
                 const wordCount = getWordCount(segment);
 
-                // 2. Initial Date Parsing to help with Candidate Detection
-                let { date, normalizedText } = parseDate(segment);
-                if (date) {
-                    console.log("DATE PARSED:", date);
+                // 3. Strict Task Validation (Must contain trigger verb)
+                const hasStrongTrigger = checkTriggers(segment, STRONG_TRIGGERS);
+                if (!hasStrongTrigger || wordCount < 3) continue; // Reject invalid/broken sentences
+
+                // Ignore casual phrases
+                if (IGNORE_PHRASES.some(p => segment.toLowerCase().includes(p))) {
+                    continue;
                 }
 
-                // 3. Task Candidate Detection
-                const hasStrongTrigger = checkTriggers(segment, STRONG_TRIGGERS);
-                const hasSoftTrigger = checkTriggers(segment, SOFT_TRIGGERS);
+                console.log("TASK CANDIDATE (VALID):", segment);
 
-                // Rule: Has trigger OR (Has Date AND >=3 words)
-                const isCandidate = hasStrongTrigger || hasSoftTrigger || (date && wordCount >= 3);
-
-                if (!isCandidate) continue;
-                console.log("TASK CANDIDATE:", segment);
+                let { date } = parseDate(segment);
 
                 // 4. Responsibility
-                // We fetch the chat to validate exact participants
                 let assignedTo = await extractResponsibility(segment, message.sender, chatId);
 
-                // 5. Urgency Check
+                // 5. Clean Title
+                let finalTitle = cleanActionableTitle(segment);
+                if (finalTitle.length < 5) continue; // Safety check
+
+                // 6. Urgency Check
                 const isUrgentKW = URGENCY_KW.some(kw => segment.toLowerCase().includes(kw));
 
-                // 6. Logic Branch / Priority
-                let finalDate = date;
+                // 7. Logic Branch
                 let finalPriority = "normal";
                 let isAi = false;
-                let finalTitle = segment;
 
-                if (finalDate) {
-                    const hoursDiff = (finalDate - new Date()) / (1000 * 60 * 60);
+                if (date) {
+                    const hoursDiff = (date - new Date()) / (1000 * 60 * 60);
                     finalPriority = hoursDiff <= 24 ? "high" : "normal";
                 } else if (isUrgentKW) {
                     finalPriority = "urgent";
-                    finalDate = null;
                 }
 
-                // 7. Gemini Fallback Logic
-                // Trigger Gemini if >5 words AND (no date OR no assignee)
-                if (wordCount > 5 && (!finalDate || !assignedTo) && model) {
+                if (wordCount > 5 && (!date || !assignedTo) && model) {
                     const geminiResult = await geminiFallbackWithRetry(segment);
                     if (geminiResult && geminiResult.isTask) {
-                        finalTitle = geminiResult.taskTitle || segment;
+                        finalTitle = geminiResult.taskTitle || finalTitle;
 
-                        if (!finalDate && geminiResult.dueDate) {
+                        if (!date && geminiResult.dueDate) {
                             const parsedAiDate = new Date(geminiResult.dueDate);
-                            if (!isNaN(parsedAiDate)) finalDate = parsedAiDate;
+                            if (!isNaN(parsedAiDate)) date = parsedAiDate;
                         }
 
                         if (!assignedTo && geminiResult.assignedToName) {
-                            // Optionally try to match the AI returned name again
                             const aiAssigned = await tryMatchNameInChat(geminiResult.assignedToName, chatId);
                             if (aiAssigned) assignedTo = aiAssigned;
                         }
@@ -103,20 +114,14 @@ const TaskExtractionService = {
                     }
                 }
 
-                // If still no date and not urgent, it's not a measurable task
-                if (!finalDate && finalPriority !== "urgent") {
+                if (!date && finalPriority !== "urgent") {
                     continue;
                 }
 
-                // Clean Title
-                if (!isAi) {
-                    finalTitle = cleanTitle(segment, normalizedText);
-                }
-
-                // 8. Deduplication & Save
+                // 8. Deduplicate & Save
                 await saveTask({
                     title: finalTitle.substring(0, 150),
-                    dueAt: finalDate,
+                    dueAt: date,
                     priority: finalPriority,
                     assignedTo: assignedTo,
                     chat: chatId,
@@ -135,11 +140,34 @@ const TaskExtractionService = {
 
 // --- Helpers ---
 
-const splitMessageIntoSegments = (text) => {
-    return text
-        .split(/\s+(?:and|mariyu)\s+|\.\s+|;|\n+/i)
-        .map(segment => segment.trim())
-        .filter(Boolean);
+const safeSegment = (text) => {
+    // 1. Split strict hard delimiters
+    let initialSegments = text.split(/\.\s+|;|\n+/i).map(s => s.trim()).filter(Boolean);
+    
+    // 2. Safe "and" / "mariyu" splitting
+    let finalSegments = [];
+    initialSegments.forEach(seg => {
+        const andParts = seg.split(/\s+and\s+|\s+mariyu\s+/i);
+        if (andParts.length > 1) {
+            let currentClause = andParts[0];
+            for (let i = 1; i < andParts.length; i++) {
+                const leftHasVerb = checkTriggers(currentClause, STRONG_TRIGGERS);
+                const rightHasVerb = checkTriggers(andParts[i], STRONG_TRIGGERS);
+                
+                if (leftHasVerb && rightHasVerb) {
+                    finalSegments.push(currentClause.trim());
+                    currentClause = andParts[i];
+                } else {
+                    currentClause += " and " + andParts[i];
+                }
+            }
+            finalSegments.push(currentClause.trim());
+        } else {
+            finalSegments.push(seg);
+        }
+    });
+
+    return finalSegments.filter(Boolean);
 };
 
 const checkTriggers = (text, triggers) => {
@@ -159,19 +187,14 @@ const parseDate = (text) => {
     return { date: null, normalizedText: "" };
 };
 
-const cleanTitle = (rawSegment, dateText) => {
-    let title = rawSegment;
-    if (dateText) {
-        title = title.replace(new RegExp(escapeRegExp(dateText), 'i'), "");
-    }
-    const allKw = [...STRONG_TRIGGERS, ...SOFT_TRIGGERS, ...URGENCY_KW];
-    allKw.forEach(w => {
-        title = title.replace(new RegExp(`\\b${escapeRegExp(w)}\\b`, 'gi'), "");
+const cleanActionableTitle = (title) => {
+    let clean = title;
+    CLEANUP_PHRASES.forEach(phrase => {
+        clean = clean.replace(new RegExp(`\\b${escapeRegExp(phrase)}\\b`, 'gi'), "");
     });
-    title = title.replace(/\s+/g, " ").trim();
-
-    // If we stripped everything (e.g., "submit asap"), fallback to original so title is not empty
-    return title.length > 0 ? title : rawSegment;
+    // Ensure first letter is capitalized for UI polish
+    clean = clean.replace(/\s+/g, " ").trim();
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
 };
 
 const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -265,10 +288,8 @@ const geminiFallback = async (segment) => {
 
 const deduplicationNormalize = (title) => {
     let normalized = title.toLowerCase();
-    // Remove stop words
-    normalized = normalized.replace(/\\b(the|a|an|to)\\b/g, "");
-    // Collapse spaces
-    return normalized.replace(/\\s+/g, " ").trim();
+    normalized = normalized.replace(/\b(the|a|an|to)\b/g, "");
+    return normalized.replace(/\s+/g, " ").trim();
 };
 
 const saveTask = async (taskData) => {
@@ -283,13 +304,11 @@ const saveTask = async (taskData) => {
         dateQuery = { dueAt: null };
     }
 
-    // Deduplication check: Chat ID + normalized Title + Date
-    // We use JS filtering inside DB for simplicity or approximate regex
+    taskData.normalizedTitle = normTitle;
+
     const existingCount = await Deadline.countDocuments({
         chat: taskData.chat,
-        // Match if DB title normalized would be the same. 
-        // We can do a simpler regex match:
-        title: new RegExp(escapeRegExp(taskData.title.trim()), 'i'),
+        normalizedTitle: normTitle,
         ...dateQuery
     });
 

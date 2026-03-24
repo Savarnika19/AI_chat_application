@@ -3,20 +3,24 @@ const { summarize: textRankSummarize } = require("../config/TextRank");
 
 // NOTE: Backend restart required after modifying summarizer.
 
-const apiKey = process.env.GEMINI_API_KEY;
 let genAI = null;
 let model = null;
 
-if (apiKey) {
-    try {
-        genAI = new GoogleGenerativeAI(apiKey);
-        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    } catch (error) {
-        console.error("Gemini initialization error:", error.message);
+const initializeGemini = () => {
+    if (!model) {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (apiKey) {
+            try {
+                genAI = new GoogleGenerativeAI(apiKey);
+                model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+            } catch (error) {
+                console.error("Gemini initialization error:", error.message);
+            }
+        } else {
+            console.warn("GEMINI_API_KEY not found in environment variables. Defaulting to TextRank.");
+        }
     }
-} else {
-    console.warn("GEMINI_API_KEY not found in environment variables. Defaulting to TextRank.");
-}
+};
 
 // Global Throttling State
 let globalRequestCount = 0;
@@ -68,14 +72,15 @@ const normalize = (str) => {
 };
 
 /**
- * Clean JSON string from markdown and control chars.
+ * Extract max 8 bullets safely
  */
-const cleanJSON = (raw) => {
-    if (!raw) return "{}";
-    let cleaned = raw.replace(/```json/g, "").replace(/```/g, "");
-    cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
-    cleaned = cleaned.replace(/,(\s*[}\]])/g, '$1'); // Trailing commas
-    return cleaned.trim();
+const extractBullets = (response) => {
+    if (!response) return "";
+    const bullets = response
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.startsWith("-") || l.startsWith("*"));
+    return bullets.slice(0, 8).map(l => l.replace(/^\*\s*/, "- ")).join("\n");
 };
 
 /**
@@ -128,71 +133,73 @@ const withRetry = async (fn, retries = 1, timeout = 6000) => {
 };
 
 /**
- * Extracts structured JSON from text chunk.
+ * Extracts bullet points from text chunk.
  */
-const extractStructured = async (text) => {
+const extractSummary = async (text) => {
     if (!model) throw new Error("Gemini not initialized");
 
     const prompt = `
-You are an information extraction assistant.
-Extract structured data from this chat segment into valid JSON.
+You are an AI assistant that extracts a concise summary from chat conversations.
 
-Categories:
-- deadlines (Include all dates, times, 'due by', 'submit by', etc.)
-- responsibilities (Who is doing what? e.g., "I'll handle X", "User Y assigned to Z")
-- financial_decisions (Costs, prices, budget limits, payments)
-- deployment_decisions (Release schedules, server updates, "going live", "deploying")
-- other_decisions (Any other important agreements or conclusions)
+Your task is to analyze the input text and return a **SHORT, HIGH-QUALITY SUMMARY** of maximum 5-8 bullet points.
 
-JSON Format:
-{
-  "deadlines": [],
-  "responsibilities": [],
-  "financial_decisions": [],
-  "deployment_decisions": [],
-  "other_decisions": []
-}
+---
+## RULES
 
-Rules:
-- Extract exact statements or clear summaries of the decision.
-- Do NOT merge multiple items into one string.
-- Return empty arrays if no info found for a category.
-- Strict valid JSON only.
+### 1. Focus on Importance
+Include ONLY:
+- Key tasks
+- Critical deadlines
+- Important financial info (if present)
+- Major decisions
+
+DO NOT include minor details, repeated info, generic statements, or technical suggestions.
+
+### 2. Strict Length Control
+- Maximum: 5 to 8 bullet points
+- Each point: 1 short line only
+- No paragraphs
+
+### 3. Merge Information
+Combine related points into single bullet points where possible.
+
+### 4. Multilingual Normalization
+Convert words like 'repu' to 'tomorrow' and 'ellundi' to 'day after tomorrow'.
+
+### 5. No Hallucination
+Only use given content. Do not add new info.
+
+### 6. NO Categories
+DO NOT group points into Tasks, Deadlines, etc. Return a single, unified list.
+
+## OUTPUT FORMAT
+Each point must start with '-' and be one short line only. Do not exceed 8 points.
+Return ONLY the bullet points.
 
 Chat Segment:
 """
 ${text}
 """
 `;
-    // Fallback Logic
     let currentModel = model;
     let fallbackTried = false;
 
     while (true) {
         try {
             dailyTokenUsage += text.length / 4;
-
-            // Use getGenerativeModel on the fly to support switching if needed
-            // But 'currentModel' is an object.
-
             const result = await currentModel.generateContent({
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.3, maxOutputTokens: 1000 },
+                generationConfig: { temperature: 0.3 },
             });
-
             const txt = result.response.text();
-
             dailyTokenUsage += txt.length / 4;
-
-            const cleaned = cleanJSON(txt);
-            return JSON.parse(cleaned);
+            return extractBullets(txt);
         } catch (error) {
             if ((error.message.includes("404") || error.message.includes("not found")) && !fallbackTried) {
-                console.warn("Gemini Flash failed (404). Falling back to gemini-pro.");
+                console.warn("Gemini Flash failed (404). Falling back to gemini-pro-latest.");
                 try {
-                    // CAUTION: 'genAI' must be available.
-                    currentModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-                    model = currentModel; // Update global
+                    currentModel = genAI.getGenerativeModel({ model: "gemini-pro-latest" });
+                    model = currentModel; 
                     fallbackTried = true;
                     continue;
                 } catch (fallbackError) {
@@ -205,41 +212,42 @@ ${text}
 };
 
 /**
- * Merges multiple JSON objects into one using Gemini if needed (Recursive).
+ * Merges multiple summaries into one final max-8 array.
  */
-const recursiveMerge = async (jsonList) => {
-    if (jsonList.length === 0) return null;
-    if (jsonList.length === 1) return jsonList[0];
+const mergeSummaries = async (textList) => {
+    if (textList.length === 0) return "";
+    if (textList.length === 1) return extractBullets(textList[0]);
 
-    const jsonString = JSON.stringify(jsonList, null, 2);
+    const listsString = textList.join("\n\n");
 
     const prompt = `
-Merge these multiple extracted JSON lists into a single consolidated JSON.
-Preserve chronological order of the lists.
-Deduplicate identical items semanticallly.
-Return strict JSON with the same schema.
+Merge the following bullet points into a final list of maximum 8 unique, non-duplicate bullet points.
+Combine related points. Do not expand. Do not exceed 8.
+Each point must start with '-' and be one short line only. Return ONLY the bullet points.
 
 Input Lists:
-${jsonString}
+${listsString}
 `;
-    dailyTokenUsage += jsonString.length / 4;
+    dailyTokenUsage += listsString.length / 4;
 
     const result = await withRetry(async () => {
         return model.generateContent({
             contents: [{ role: "user", parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.2, maxOutputTokens: 1500 },
+            generationConfig: { temperature: 0.2 },
         });
-    }, 1, 8000); // 8s timeout for merge
+    }, 0, 60000); 
 
     const txt = result.response.text();
     dailyTokenUsage += txt.length / 4;
-    return JSON.parse(cleanJSON(txt));
+    return extractBullets(txt);
 };
 
 /**
  * Main Summary Function
  */
 const summarize = async (input, chatId = "unknown") => {
+    initializeGemini();
+
     // 0. Safeguards
     if (dailyTokenUsage > DAILY_TOKEN_LIMIT) {
         console.warn("Daily token limit exceeded. Falling back to TextRank.");
@@ -277,44 +285,45 @@ const summarize = async (input, chatId = "unknown") => {
 
             // 5. Map Phase (Parallel Extraction)
             const extractionPromises = chunks.map(chunk =>
-                limiter(() => withRetry(() => extractStructured(chunk), 1, 8000))
+                limiter(() => withRetry(() => extractSummary(chunk), 0, 60000))
             );
 
             const results = await Promise.allSettled(extractionPromises);
 
             // Filter success
-            let successfulJSONs = results
+            let successfulResults = results
                 .filter(r => r.status === 'fulfilled')
-                .map(r => r.value);
+                .map(r => r.value)
+                .filter(t => t.length > 0);
 
-            if (successfulJSONs.length === 0) {
+            if (successfulResults.length === 0) {
                 const errors = results.filter(r => r.status === 'rejected').map(r => r.reason.message);
                 console.error("All chunks failed. Errors:", errors);
                 throw new Error("All extractions failed: " + errors.join(", "));
             }
 
             // 6. Level 2 Recursive Merge (if needed)
-            while (successfulJSONs.length > 5) {
+            while (successfulResults.length > 5) {
                 const nextLevel = [];
-                for (let i = 0; i < successfulJSONs.length; i += 5) {
-                    const batch = successfulJSONs.slice(i, i + 5);
+                for (let i = 0; i < successfulResults.length; i += 5) {
+                    const batch = successfulResults.slice(i, i + 5);
                     try {
-                        const merged = await recursiveMerge(batch);
+                        const merged = await mergeSummaries(batch);
                         if (merged) nextLevel.push(merged);
                     } catch (e) {
-                        console.warn("Merge batch failed, keeping distinct items:", e.message);
-                        nextLevel.push(simpleJSMerge(batch));
+                        console.warn("Merge batch failed:", e.message);
+                        // Fallback: manually concat and trim
+                        const manualConcat = batch.join("\n").split("\n").filter(l => l.trim().startsWith("-")).slice(0, 8).join("\n");
+                        nextLevel.push(manualConcat);
                     }
                 }
-                successfulJSONs = nextLevel;
+                successfulResults = nextLevel;
             }
 
             // 7. Final Integration
-            const validData = simpleJSMerge(successfulJSONs);
+            const finalSummary = await mergeSummaries(successfulResults);
 
-            // 8. Format
-            const finalSummary = formatSummary(validData);
-            return finalSummary || "No significant decisions found.";
+            return finalSummary || textRankFallback(input);
         })();
 
         // Global 60s Timeout
@@ -324,33 +333,10 @@ const summarize = async (input, chatId = "unknown") => {
         ]);
 
     } catch (error) {
+        require('fs').appendFileSync('frontend_debug.log', new Date().toISOString() + " Gemini Aggregation Failed: " + error.message + '\n' + error.stack + '\n\n');
         console.error("Gemini Aggregation Failed:", error.message);
         return textRankFallback(messages);
     }
-};
-
-/**
- * Validates and flattens a list of JSON objects into one using simple JS (Deterministic).
- */
-const simpleJSMerge = (list) => {
-    const master = {
-        deadlines: [],
-        responsibilities: [],
-        financial_decisions: [],
-        deployment_decisions: [],
-        other_decisions: []
-    };
-
-    list.forEach(item => {
-        if (!item) return;
-        if (item.deadlines) master.deadlines.push(...item.deadlines);
-        if (item.responsibilities) master.responsibilities.push(...item.responsibilities);
-        if (item.financial_decisions) master.financial_decisions.push(...item.financial_decisions);
-        if (item.deployment_decisions) master.deployment_decisions.push(...item.deployment_decisions);
-        if (item.other_decisions) master.other_decisions.push(...item.other_decisions);
-    });
-
-    return master;
 };
 
 /**
@@ -358,55 +344,27 @@ const simpleJSMerge = (list) => {
  */
 const textRankFallback = (messages) => {
     console.log("Using TextRank Fallback");
-    const text = Array.isArray(messages)
-        ? messages.map(m => m.content).join(" ")
-        : messages;
-
+    let text = "";
     try {
-        return textRankSummarize(text, 3);
-    } catch (e) {
-        return "Summary unavailable.";
-    }
-};
+        text = Array.isArray(messages)
+            ? messages.map(m => m.content).join(" ")
+            : messages;
 
-/**
- * Format Final Paragraph
- */
-const formatSummary = (data) => {
-    let parts = [];
-    const seen = new Set();
-
-    const addCategory = (items) => {
-        if (items && Array.isArray(items) && items.length > 0) {
-            const validItems = items
-                .filter(i => typeof i === 'string' && i.trim().length > 0)
-                .map(i => i.trim());
-
-            const uniqueItems = [];
-            validItems.forEach(i => {
-                const key = normalize(i);
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    uniqueItems.push(i);
-                }
-            });
-
-            if (uniqueItems.length > 0) {
-                const text = uniqueItems.map(item => {
-                    return /[.!?]$/.test(item) ? item : item + ".";
-                }).join(" ");
-                parts.push(text);
-            }
+        const trStr = textRankSummarize(text, 5); // 5 sentences max
+        if (trStr && trStr !== "Summary unavailable.") {
+            const lines = trStr.split(". ").filter(l => l.trim().length > 0);
+            const bullets = lines.map(l => `- ${l.trim().replace(/\.$/, "")}`);
+            return bullets.slice(0, 8).join("\n");
         }
-    };
-
-    addCategory(data.deadlines);
-    addCategory(data.responsibilities);
-    addCategory(data.financial_decisions);
-    addCategory(data.deployment_decisions);
-    addCategory(data.other_decisions);
-
-    return parts.join(" ");
+    } catch (e) {
+        console.warn("TextRank also failed:", e.message);
+    }
+    
+    // Ultimate Fallback: just return the first few text blobs directly
+    if (Array.isArray(messages)) {
+        return messages.slice(0, 5).map(m => `- ${m.content || ""}`.trim()).join("\n");
+    }
+    return `- ${text.substring(0, 100).trim()}...`;
 };
 
 module.exports = { summarize };

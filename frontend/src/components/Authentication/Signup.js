@@ -111,10 +111,25 @@ const Signup = () => {
           setPic(data.url.toString());
           console.log(data.url.toString());
           setPicLoading(false);
+          toast({
+            title: "Image uploaded successfully",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+            position: "bottom",
+          });
         })
         .catch((err) => {
           console.log(err);
+          setPic("https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg");
           setPicLoading(false);
+          toast({
+            title: "Image upload failed, using default avatar",
+            status: "warning",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
         });
     } else {
       toast({

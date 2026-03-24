@@ -8,6 +8,11 @@ const deadlineSchema = mongoose.Schema(
             trim: true,
             default: "Deadline",
         },
+        normalizedTitle: {
+            type: String,
+            trim: true,
+            default: "",
+        },
         dueAt: {
             type: Date,
             required: false, // Made optional to support 'urgent' tasks without dates

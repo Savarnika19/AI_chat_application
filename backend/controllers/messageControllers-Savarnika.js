@@ -123,14 +123,25 @@ const deleteMessages = asyncHandler(async (req, res) => {
     throw new Error("No message IDs provided");
   }
 
-  // Soft Delete: Add user to deletedBy array
-  const result = await Message.updateMany(
-    { _id: { $in: messageIds } },
-    { $addToSet: { deletedBy: req.user._id } }
+  // Find affected chats before deleting
+  const messagesToDelete = await Message.find({ _id: { $in: messageIds } });
+  const chatIds = [...new Set(messagesToDelete.map(m => m.chat.toString()))];
+
+  // Hard Delete: Remove completely from the database
+  const result = await Message.deleteMany(
+    { _id: { $in: messageIds } }
   );
 
-  if (result.nModified > 0 || result.acknowledged) { // nModified or acknowledged check
-    res.json({ message: "Messages deleted", deletedCount: result.nModified || messageIds.length });
+  // Update latestMessage for affected chats
+  for (const chatId of chatIds) {
+    const latestMsg = await Message.findOne({ chat: chatId }).sort({ createdAt: -1 });
+    await Chat.findByIdAndUpdate(chatId, {
+      latestMessage: latestMsg ? latestMsg._id : null
+    });
+  }
+
+  if (result.deletedCount > 0 || result.acknowledged) {
+    res.json({ message: "Messages deleted", deletedCount: result.deletedCount || messageIds.length });
   } else {
     res.status(404);
     throw new Error("No messages found to delete");

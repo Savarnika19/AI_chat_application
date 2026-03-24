@@ -12,7 +12,8 @@ const ExpenseGroupPage = () => {
 
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [submittingId, setSubmittingId] = useState(null);
+  const [calculating, setCalculating] = useState(false);
   const [amounts, setAmounts] = useState({});
 
   const fetchGroup = async () => {
@@ -39,31 +40,31 @@ const ExpenseGroupPage = () => {
     }
 
     try {
-      setSubmitting(true);
+      setSubmittingId(targetUserId);
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       const { data } = await axios.post(`/api/expenses/${groupId}/submit`, { targetUserId, amount: Number(amount) }, config);
       
       // Setting group replaces the entire layout and locks the row
       setGroup(data.expenseGroup);
-      setSubmitting(false);
+      setSubmittingId(null);
       toast({ title: "Payment logged", status: "success", duration: 2000, isClosable: true });
     } catch (error) {
-      setSubmitting(false);
+      setSubmittingId(null);
       toast({ title: "Error Saving", description: error.response?.data?.message || error.message, status: "error", duration: 3000, isClosable: true });
     }
   };
 
   const handleCalculate = async () => {
     try {
-      setSubmitting(true);
+      setCalculating(true);
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       
       // Finish forces zeros on any empty inputs inherently, and fires our notifications
       const { data } = await axios.post(`/api/expenses/${groupId}/finish`, {}, config);
       setGroup(data.expenseGroup);
-      setSubmitting(false);
+      setCalculating(false);
     } catch (error) {
-      setSubmitting(false);
+      setCalculating(false);
       toast({ title: "Error Calculating", description: error.response?.data?.message || error.message, status: "error", duration: 3000, isClosable: true });
     }
   };
@@ -102,9 +103,10 @@ const ExpenseGroupPage = () => {
                       type="number" 
                       value={amounts[p._id] || ""} 
                       onChange={(e) => setAmounts({ ...amounts, [p._id]: e.target.value })} 
+                      isDisabled={submittingId === p._id || calculating}
                     />
                   </FormControl>
-                  <Button colorScheme="blue" size="sm" onClick={() => handleSavePayment(p._id)} isLoading={submitting}>
+                  <Button colorScheme="blue" size="sm" onClick={() => handleSavePayment(p._id)} isLoading={submittingId === p._id} isDisabled={submittingId !== null || calculating}>
                     Save
                   </Button>
                 </HStack>
@@ -112,7 +114,7 @@ const ExpenseGroupPage = () => {
             }
           })}
           
-          <Button colorScheme="red" mt={8} w="100%" onClick={handleCalculate} isLoading={submitting}>
+          <Button colorScheme="red" mt={8} w="100%" onClick={handleCalculate} isLoading={calculating} isDisabled={submittingId !== null}>
             Calculate Settlements
           </Button>
         </VStack>

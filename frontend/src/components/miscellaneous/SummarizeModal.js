@@ -33,7 +33,7 @@ const SummarizeModal = ({ isOpen, onClose, summary, loading }) => {
                     {loading ? (
                         <Text>Generating summary...</Text>
                     ) : (
-                        <Text fontSize="18px" fontFamily="Work sans">
+                        <Text fontSize="18px" fontFamily="Work sans" whiteSpace="pre-wrap">
                             {summary || "No summary available."}
                         </Text>
                     )}

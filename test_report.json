@@ -1,0 +1,495 @@
+{
+  "extraction": [
+    {
+      "message": "Submit the report tomorrow at 5pm",
+      "type": "English",
+      "extracted": [
+        {
+          "title": "the report",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2362bda907752a8e6bb2b",
+          "dueAt": "2026-03-25T11:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2362ada907752a8e6bb27",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "Submit the report tomorrow at 5pm",
+          "createdAt": "2026-03-24T06:58:51.043Z",
+          "updatedAt": "2026-03-24T06:58:51.043Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "Finish backend work by Friday evening",
+      "type": "English",
+      "extracted": [
+        {
+          "title": "backend work by",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2362eda907752a8e6bb32",
+          "dueAt": "2026-03-27T14:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2362dda907752a8e6bb2e",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "Finish backend work by Friday evening",
+          "createdAt": "2026-03-24T06:58:54.044Z",
+          "updatedAt": "2026-03-24T06:58:54.044Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "Prepare slides and deploy code Monday",
+      "type": "English",
+      "extracted": [
+        {
+          "title": "code",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23630da907752a8e6bb39",
+          "dueAt": "2026-03-23T06:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23630da907752a8e6bb35",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "deploy code Monday",
+          "createdAt": "2026-03-24T06:58:56.239Z",
+          "updatedAt": "2026-03-24T06:58:56.239Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "repu project submit cheyali",
+      "type": "Telugu",
+      "extracted": [
+        {
+          "title": "repu project",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23632da907752a8e6bb40",
+          "dueAt": "2026-03-25T06:58:58.388Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23632da907752a8e6bb3c",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "repu project submit cheyali",
+          "createdAt": "2026-03-24T06:58:58.424Z",
+          "updatedAt": "2026-03-24T06:58:58.424Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "ellundi morning meeting undi",
+      "type": "Telugu",
+      "extracted": [
+        {
+          "title": "ellundi morning meeting undi",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23634da907752a8e6bb47",
+          "dueAt": "2026-03-25T00:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23634da907752a8e6bb43",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "ellundi morning meeting undi",
+          "createdAt": "2026-03-24T06:59:00.617Z",
+          "updatedAt": "2026-03-24T06:59:00.617Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "ivala report complete cheyyali",
+      "type": "Telugu",
+      "extracted": [
+        {
+          "title": "ivala report",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23636da907752a8e6bb4e",
+          "dueAt": "2026-03-24T06:59:02.835Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23636da907752a8e6bb4a",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "ivala report complete cheyyali",
+          "createdAt": "2026-03-24T06:59:02.892Z",
+          "updatedAt": "2026-03-24T06:59:02.892Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "repu submit cheyali report",
+      "type": "Mixed",
+      "extracted": [
+        {
+          "title": "repu report",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23639da907752a8e6bb55",
+          "dueAt": "2026-03-25T06:59:05.058Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23638da907752a8e6bb51",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "repu submit cheyali report",
+          "createdAt": "2026-03-24T06:59:05.089Z",
+          "updatedAt": "2026-03-24T06:59:05.089Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "project ellundi complete cheyali and deploy Friday",
+      "type": "Mixed",
+      "extracted": [
+        {
+          "title": "project ellundi",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2363bda907752a8e6bb5c",
+          "dueAt": "2026-03-25T06:59:07.239Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2363bda907752a8e6bb58",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "project ellundi complete cheyali",
+          "createdAt": "2026-03-24T06:59:07.264Z",
+          "updatedAt": "2026-03-24T06:59:07.264Z",
+          "__v": 0
+        },
+        {
+          "title": "deploy Friday",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2363bda907752a8e6bb5f",
+          "dueAt": "2026-03-27T06:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2363bda907752a8e6bb58",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "deploy Friday",
+          "createdAt": "2026-03-24T06:59:07.316Z",
+          "updatedAt": "2026-03-24T06:59:07.316Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "Ravi will complete task repu evening",
+      "type": "Mixed",
+      "extracted": [
+        {
+          "title": "Ravi will task repu evening",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2363dda907752a8e6bb68",
+          "dueAt": "2026-03-25T14:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2363dda907752a8e6bb62",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "Ravi will complete task repu evening",
+          "createdAt": "2026-03-24T06:59:09.547Z",
+          "updatedAt": "2026-03-24T06:59:09.547Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "submit report tomorrow and deploy backend friday",
+      "type": "Multi-task",
+      "extracted": [
+        {
+          "title": "backend",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2363fda907752a8e6bb70",
+          "dueAt": "2026-03-27T06:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2363fda907752a8e6bb6b",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "deploy backend friday",
+          "createdAt": "2026-03-24T06:59:11.768Z",
+          "updatedAt": "2026-03-24T06:59:11.768Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "prepare slides monday mariyu meeting ellundi morning",
+      "type": "Multi-task",
+      "extracted": [
+        {
+          "title": "slides",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23641da907752a8e6bb77",
+          "dueAt": "2026-03-23T06:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23641da907752a8e6bb73",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "prepare slides monday",
+          "createdAt": "2026-03-24T06:59:13.972Z",
+          "updatedAt": "2026-03-24T06:59:13.972Z",
+          "__v": 0
+        },
+        {
+          "title": "meeting ellundi morning",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23642da907752a8e6bb7a",
+          "dueAt": "2026-03-25T00:30:00.000Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23641da907752a8e6bb73",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "meeting ellundi morning",
+          "createdAt": "2026-03-24T06:59:14.029Z",
+          "updatedAt": "2026-03-24T06:59:14.029Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "finish UI today and Ravi will test tomorrow",
+      "type": "Multi-task",
+      "extracted": [
+        {
+          "title": "UI",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23644da907752a8e6bb81",
+          "dueAt": "2026-03-24T06:59:16.314Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23644da907752a8e6bb7d",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "finish UI today",
+          "createdAt": "2026-03-24T06:59:16.373Z",
+          "updatedAt": "2026-03-24T06:59:16.373Z",
+          "__v": 0
+        },
+        {
+          "title": "Ravi will test",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23644da907752a8e6bb86",
+          "dueAt": "2026-03-25T06:59:16.527Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23644da907752a8e6bb7d",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "Ravi will test tomorrow",
+          "createdAt": "2026-03-24T06:59:16.710Z",
+          "updatedAt": "2026-03-24T06:59:16.710Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "Ravi will submit report tomorrow",
+      "type": "Responsibility",
+      "extracted": [
+        {
+          "title": "Ravi will report",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23647da907752a8e6bb8f",
+          "dueAt": "2026-03-25T06:59:18.992Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23646da907752a8e6bb89",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "Ravi will submit report tomorrow",
+          "createdAt": "2026-03-24T06:59:19.066Z",
+          "updatedAt": "2026-03-24T06:59:19.066Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "I will complete this by Friday",
+      "type": "Responsibility",
+      "extracted": [
+        {
+          "title": "I will this by",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23649da907752a8e6bb96",
+          "dueAt": "2026-03-27T06:30:00.000Z",
+          "assignedTo": "69710c3523194d41f468072b",
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23649da907752a8e6bb92",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "I will complete this by Friday",
+          "createdAt": "2026-03-24T06:59:21.248Z",
+          "updatedAt": "2026-03-24T06:59:21.248Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "@Sahithi finish this by tomorrow",
+      "type": "Responsibility",
+      "extracted": [
+        {
+          "title": "@Sahithi this by",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2364bda907752a8e6bb9d",
+          "dueAt": "2026-03-25T06:59:23.410Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2364bda907752a8e6bb99",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "@Sahithi finish this by tomorrow",
+          "createdAt": "2026-03-24T06:59:23.438Z",
+          "updatedAt": "2026-03-24T06:59:23.438Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "meeting friday",
+      "type": "Edge",
+      "extracted": []
+    },
+    {
+      "message": "see you tomorrow",
+      "type": "Edge",
+      "extracted": [
+        {
+          "title": "see you",
+          "priority": "high",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c2364fda907752a8e6bba8",
+          "dueAt": "2026-03-25T06:59:27.833Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c2364fda907752a8e6bba4",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "see you tomorrow",
+          "createdAt": "2026-03-24T06:59:27.883Z",
+          "updatedAt": "2026-03-24T06:59:27.883Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "submit asap",
+      "type": "Edge",
+      "extracted": [
+        {
+          "title": "submit asap",
+          "priority": "urgent",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23652da907752a8e6bbbc",
+          "dueAt": null,
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23652da907752a8e6bbb8",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "submit asap",
+          "createdAt": "2026-03-24T06:59:30.142Z",
+          "updatedAt": "2026-03-24T06:59:30.142Z",
+          "__v": 0
+        }
+      ]
+    },
+    {
+      "message": "complete this soon",
+      "type": "Edge",
+      "extracted": []
+    },
+    {
+      "message": "random message without task",
+      "type": "Edge",
+      "extracted": []
+    },
+    {
+      "message": "k",
+      "type": "FailureTest",
+      "extracted": []
+    },
+    {
+      "message": "ok",
+      "type": "FailureTest",
+      "extracted": []
+    },
+    {
+      "message": "yes",
+      "type": "FailureTest",
+      "extracted": []
+    },
+    {
+      "message": "I will do it",
+      "type": "FailureTest",
+      "extracted": []
+    },
+    {
+      "message": "let's plan something",
+      "type": "FailureTest",
+      "extracted": []
+    },
+    {
+      "message": "maybe next week",
+      "type": "FailureTest",
+      "extracted": [
+        {
+          "title": "maybe",
+          "priority": "normal",
+          "status": "pending",
+          "isAiGenerated": false,
+          "_id": "69c23663da907752a8e6bbe8",
+          "dueAt": "2026-03-31T06:59:47.599Z",
+          "assignedTo": null,
+          "chat": "69c2362ada907752a8e6bb21",
+          "message": "69c23663da907752a8e6bbe4",
+          "createdBy": "69710c3523194d41f468072b",
+          "originalText": "maybe next week",
+          "createdAt": "2026-03-24T06:59:47.655Z",
+          "updatedAt": "2026-03-24T06:59:47.655Z",
+          "__v": 0
+        }
+      ]
+    }
+  ],
+  "summarization": {
+    "part3": "repu project submit cheyali Ravi will review code tomorrow We spent 1500 on dinner meeting ellundi morning prepare slides friday I paid 500 for snacks deploy backend monday",
+    "onlyTelugu": "repu testing cheyali ellundi project ivvali",
+    "onlyEnglish": "review code today push to prod tomorrow",
+    "mixedLong": "we need to finish this soon, repu chusdam kudurte friday lopu test chedam. anyway deploy monday confirm",
+    "noTask": "hi how are you what did you have for dinner ok cool"
+  }
+}

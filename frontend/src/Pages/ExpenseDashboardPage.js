@@ -15,6 +15,7 @@ const ExpenseDashboardPage = () => {
   const history = useHistory();
 
   const fetchGroups = async () => {
+    if (!user || !user.token) return;
     try {
       setLoading(true);
       const config = { headers: { Authorization: `Bearer ${user.token}` } };

@@ -7,11 +7,11 @@
 
 // Stage 1: Phrase-Level Map (Longest match first)
 const PHRASE_MAP = [
-    { from: "day after tomorrow", to: "day after tomorrow" }, // Keep English intact
-    { from: "day after tmrw", to: "day after tomorrow" },
-    { from: "ellundi madyanam", to: "day after tomorrow afternoon" },
-    { from: "ellundi poddunna", to: "day after tomorrow morning" },
-    { from: "ellundi sayantram", to: "day after tomorrow evening" },
+    { from: "day after tomorrow", to: "the day after tomorrow" }, // Keep English intact
+    { from: "day after tmrw", to: "the day after tomorrow" },
+    { from: "ellundi madyanam", to: "the day after tomorrow afternoon" },
+    { from: "ellundi poddunna", to: "the day after tomorrow morning" },
+    { from: "ellundi sayantram", to: "the day after tomorrow evening" },
     { from: "repu madyanam", to: "tomorrow afternoon" },
     { from: "repu poddunna", to: "tomorrow morning" },
     { from: "repu sayantram", to: "tomorrow evening" },
@@ -24,7 +24,7 @@ const PHRASE_MAP = [
 // Stage 2: Word-Level Map
 const WORD_MAP = {
     "repu": "tomorrow",
-    "ellundi": "day after tomorrow",
+    "ellundi": "the day after tomorrow",
     "ivala": "today",
     "ivvala": "today",
     "ninna": "yesterday",
