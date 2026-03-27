@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     Drawer,
     DrawerBody,
@@ -9,8 +9,6 @@ import {
     Box,
     Text,
     Button,
-    Stack,
-    Badge,
     Spinner,
     useToast,
     Tabs,
@@ -28,7 +26,7 @@ const GlobalDeadlineDrawer = ({ isOpen, onClose }) => {
     const [completedDeadlines, setCompletedDeadlines] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const { user, setSelectedChat, setScrollToMessage, chats, setChats } = ChatState();
+    const { user, setSelectedChat, setScrollToMessage, chats } = ChatState();
     const toast = useToast();
     const history = useHistory();
 

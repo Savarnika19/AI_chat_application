@@ -1,5 +1,8 @@
 import { ViewIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
+  Box,
+  Flex,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -11,7 +14,7 @@ import {
   useDisclosure,
   IconButton,
   Text,
-  Image,
+  VStack,
 } from "@chakra-ui/react";
 
 const ProfileModal = ({ user, children }) => {
@@ -26,37 +29,65 @@ const ProfileModal = ({ user, children }) => {
       )}
       <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent h="410px">
-          <ModalHeader
-            fontSize="40px"
-            fontFamily="Work sans"
-            d="flex"
-            justifyContent="center"
-          >
-            {user.name}
+        <ModalContent
+          borderRadius="2xl"
+          overflow="hidden"
+          boxShadow="2xl"
+          maxW={{ base: "92vw", md: "520px" }}
+        >
+          <ModalHeader p={0}>
+            <Box
+              px={{ base: 5, md: 6 }}
+              py={{ base: 5, md: 6 }}
+              bg="linear-gradient(135deg, #E7F0FF 0%, #FFFFFF 70%)"
+            >
+              <Flex align="center" gap={4}>
+                <Avatar
+                  name={user.name}
+                  src={user.pic}
+                  size="xl"
+                  border="3px solid white"
+                />
+                <Box>
+                  <Text
+                    fontSize={{ base: "2xl", md: "3xl" }}
+                    fontWeight="700"
+                    color="gray.800"
+                    fontFamily="Work sans"
+                    lineHeight="1.1"
+                  >
+                    {user.name}
+                  </Text>
+                </Box>
+              </Flex>
+            </Box>
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody
-            d="flex"
-            flexDir="column"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Image
-              borderRadius="full"
-              boxSize="150px"
-              src={user.pic}
-              alt={user.name}
-            />
-            <Text
-              fontSize={{ base: "28px", md: "30px" }}
-              fontFamily="Work sans"
-            >
-              Email: {user.email}
-            </Text>
+          <ModalBody px={{ base: 5, md: 6 }} py={{ base: 5, md: 6 }}>
+            <VStack align="stretch" spacing={3}>
+              <Box>
+                <Text
+                  fontSize="xs"
+                  letterSpacing="0.08em"
+                  textTransform="uppercase"
+                  color="gray.500"
+                  mb={1}
+                >
+                  Contact
+                </Text>
+                <Text fontSize="sm" color="gray.600">
+                  Primary email
+                </Text>
+                <Text fontSize="md" fontWeight="600" color="gray.800">
+                  {user.email}
+                </Text>
+              </Box>
+            </VStack>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={onClose}>Close</Button>
+          <ModalFooter px={{ base: 5, md: 6 }} pb={{ base: 5, md: 6 }}>
+            <Button onClick={onClose} colorScheme="blue">
+              Close
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

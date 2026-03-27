@@ -18,7 +18,7 @@ const ExpenseGroupCreateModal = ({ children, onGroupCreated }) => {
   const toast = useToast();
 
   const handleOpen = () => {
-    // Automatically include the current user in a newly created workspace
+    // Automatically include the current user in a newly created group
     setSelectedUsers([user]);
     onOpen();
   };
@@ -77,13 +77,13 @@ const ExpenseGroupCreateModal = ({ children, onGroupCreated }) => {
       setLoading(false);
       onClose();
       
-      toast({ title: "Workspace Created", status: "success", duration: 3000, isClosable: true });
+      toast({ title: "Group Created", status: "success", duration: 3000, isClosable: true });
 
       if (onGroupCreated) {
         onGroupCreated(data.expenseGroup, data.notifications);
       }
     } catch (error) {
-      toast({ title: "Error Creating Workspace", description: error.response?.data?.message || error.message, status: "error", duration: 5000, isClosable: true });
+      toast({ title: "Error Creating Group", description: error.response?.data?.message || error.message, status: "error", duration: 5000, isClosable: true });
       setLoading(false);
     }
   };
@@ -95,7 +95,7 @@ const ExpenseGroupCreateModal = ({ children, onGroupCreated }) => {
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create Shared Workspace</ModalHeader>
+          <ModalHeader>Create Shared Group</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Box w="100%" d="flex" flexWrap="wrap" mb={2}>
@@ -120,7 +120,7 @@ const ExpenseGroupCreateModal = ({ children, onGroupCreated }) => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={handleCreateGroup} isLoading={loading}>
-              Create Workspace
+              Create Group
             </Button>
             <Button onClick={onClose}>Cancel</Button>
           </ModalFooter>

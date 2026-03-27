@@ -174,4 +174,28 @@ const finishGroup = asyncHandler(async (req, res) => {
   res.status(200).json({ expenseGroup: group, notifications: createdNotifications });
 });
 
-module.exports = { createExpenseGroup, submitExpense, getExpenseGroup, getAllGroups, finishGroup };
+const deleteExpenseGroup = asyncHandler(async (req, res) => {
+  const groupId = req.params.id;
+  const userId = req.user._id;
+
+  const group = await ExpenseGroup.findById(groupId);
+  if (!group) {
+    res.status(404);
+    throw new Error("Expense group not found");
+  }
+
+  const isParticipant = group.participants.some(
+    (participantId) => participantId.toString() === userId.toString()
+  );
+  if (!isParticipant) {
+    res.status(403);
+    throw new Error("Only participants can delete this group");
+  }
+
+  await Notification.deleteMany({ expenseGroup: group._id });
+  await ExpenseGroup.deleteOne({ _id: groupId });
+
+  res.status(200).json({ message: "Expense group deleted" });
+});
+
+module.exports = { createExpenseGroup, submitExpense, getExpenseGroup, getAllGroups, finishGroup, deleteExpenseGroup };

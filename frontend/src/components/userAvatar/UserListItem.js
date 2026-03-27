@@ -30,7 +30,9 @@ const UserListItem = ({ user, handleFunction }) => {
         src={user.pic}
       />
       <Box>
-        <Text>{user.name}</Text>
+        <Text fontFamily="Work sans" fontWeight="600" fontSize="md">
+          {user.name}
+        </Text>
         <Text fontSize="xs">
           <b>Email : </b>
           {user.email}

@@ -352,9 +352,48 @@ const textRankFallback = (messages) => {
 
         const trStr = textRankSummarize(text, 5); // 5 sentences max
         if (trStr && trStr !== "Summary unavailable.") {
-            const lines = trStr.split(". ").filter(l => l.trim().length > 0);
-            const bullets = lines.map(l => `- ${l.trim().replace(/\.$/, "")}`);
-            return bullets.slice(0, 8).join("\n");
+            const normalizeLine = (line) => line.trim().toLowerCase().replace(/\s+/g, " ");
+            const isTrivial = (line) => {
+                const t = normalizeLine(line);
+                if (t.length < 8) return true;
+                return [
+                    "ok",
+                    "okay",
+                    "ok.",
+                    "okay.",
+                    "done",
+                    "done.",
+                    "yes",
+                    "yes.",
+                    "no",
+                    "no.",
+                    "hi",
+                    "hii",
+                    "hello",
+                    "thanks",
+                    "thank you",
+                    "good",
+                    "great"
+                ].includes(t);
+            };
+
+            const lines = trStr
+                .split(". ")
+                .map(l => l.trim().replace(/\.$/, ""))
+                .filter(l => l.length > 0 && !isTrivial(l));
+
+            const seen = new Set();
+            const bullets = [];
+            for (const line of lines) {
+                const key = normalizeLine(line);
+                if (seen.has(key)) continue;
+                seen.add(key);
+                bullets.push(`- ${line}`);
+            }
+
+            if (bullets.length > 0) {
+                return bullets.slice(0, 8).join("\n");
+            }
         }
     } catch (e) {
         console.warn("TextRank also failed:", e.message);
@@ -362,7 +401,43 @@ const textRankFallback = (messages) => {
     
     // Ultimate Fallback: just return the first few text blobs directly
     if (Array.isArray(messages)) {
-        return messages.slice(0, 5).map(m => `- ${m.content || ""}`.trim()).join("\n");
+        const normalizeLine = (line) => line.trim().toLowerCase().replace(/\s+/g, " ");
+        const isTrivial = (line) => {
+            const t = normalizeLine(line);
+            if (t.length < 8) return true;
+            return [
+                "ok",
+                "okay",
+                "ok.",
+                "okay.",
+                "done",
+                "done.",
+                "yes",
+                "yes.",
+                "no",
+                "no.",
+                "hi",
+                "hii",
+                "hello",
+                "thanks",
+                "thank you",
+                "good",
+                "great"
+            ].includes(t);
+        };
+
+        const seen = new Set();
+        const bullets = [];
+        for (const msg of messages) {
+            const content = (msg.content || "").trim();
+            if (!content || isTrivial(content)) continue;
+            const key = normalizeLine(content);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            bullets.push(`- ${content}`);
+            if (bullets.length >= 5) break;
+        }
+        if (bullets.length > 0) return bullets.join("\n");
     }
     return `- ${text.substring(0, 100).trim()}...`;
 };

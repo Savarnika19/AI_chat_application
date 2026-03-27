@@ -1,5 +1,8 @@
 const dotenv = require("dotenv");
-dotenv.config({ path: "backend/.env" });
+const path = require("path");
+
+// Load root .env regardless of where the server is started from
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const express = require("express");
 const connectDB = require("./config/db");
@@ -8,7 +11,6 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const deadlineRoutes = require("./routes/deadlineRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-const path = require("path");
 
 const startServer = async () => {
   try {
@@ -16,6 +18,13 @@ const startServer = async () => {
     const app = express();
 
     app.use(express.json()); // to accept json data
+
+    // Avoid 304 responses for API calls (axios treats 304 as an error)
+    app.disable("etag");
+    app.use("/api", (req, res, next) => {
+      res.set("Cache-Control", "no-store");
+      next();
+    });
 
     // app.get("/", (req, res) => {
     //   res.send("API Running!");

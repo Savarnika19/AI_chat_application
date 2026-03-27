@@ -2,7 +2,7 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { IconButton, Spinner, useToast, Button, useDisclosure } from "@chakra-ui/react";
+import { IconButton, Spinner, useToast, Button, useDisclosure, Menu, MenuButton, MenuList, MenuItem, VStack, HStack } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -16,7 +16,6 @@ import io from "socket.io-client";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import SummarizeModal from "./miscellaneous/SummarizeModal";
 import { ChatState } from "../Context/ChatProvider";
-import { motion } from "framer-motion"; // Import motion
 const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
@@ -48,6 +47,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   };
   const { selectedChat, setSelectedChat, user, notification, setNotification, dbNotifications, setDbNotifications, scrollToMessage, setScrollToMessage } =
     ChatState();
+  const otherUser = selectedChat && !selectedChat.isGroupChat
+    ? getSenderFull(user, selectedChat.users)
+    : null;
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -65,7 +67,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         `/api/message/${selectedChat._id}`,
         config
       );
-      setMessages(data);
+      setMessages(
+        data.filter((m) => !m.content?.startsWith("[SUMMARY]"))
+      );
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
@@ -134,6 +138,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     const handleMessageReceived = (newMessageRecieved) => {
+      if (newMessageRecieved?.content?.startsWith("[SUMMARY]")) {
+        return;
+      }
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageRecieved.chat._id
@@ -294,9 +301,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             d="flex"
             justifyContent={{ base: "space-between" }}
             alignItems="center"
-            color="white"
+            color="#111827"
             fontWeight="bold"
-            style={{ textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}
           >
             <IconButton
               d={{ base: "flex", md: "none" }}
@@ -306,18 +312,35 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             {messages &&
               (!selectedChat.isGroupChat ? (
                 <>
-                  {getSender(user, selectedChat.users)}
-                  <ProfileModal
-                    user={getSenderFull(user, selectedChat.users)}
-                  />
-                  <IconButton
-                    d={{ base: "flex" }}
-                    icon={<i className="fas fa-trash"></i>} // FontAwesome trash icon or import from chakra
-                    colorScheme="red"
-                    size="sm"
-                    ml={2}
-                    onClick={() => handleDeleteChat()}
-                  />
+                  <Text as="span" color="#111827">
+                    {getSender(user, selectedChat.users)}
+                  </Text>
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      aria-label="Chat options"
+                      icon={<i className="fas fa-ellipsis-v"></i>}
+                      variant="ghost"
+                      size="sm"
+                      ml={2}
+                    />
+                    <MenuList fontSize="sm" minW="150px" p={1}>
+                      {otherUser && (
+                        <ProfileModal user={otherUser}>
+                          <MenuItem fontSize="sm" borderRadius="md">
+                            View contact
+                          </MenuItem>
+                        </ProfileModal>
+                      )}
+                      <MenuItem
+                        fontSize="sm"
+                        borderRadius="md"
+                        onClick={() => handleDeleteChat()}
+                      >
+                        Delete chat
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
                 </>
               ) : (
                 <>
@@ -362,13 +385,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             flexDir="column"
             justifyContent="flex-end"
             p={3}
-            bg="rgba(255, 255, 255, 0.6)"
+            bg="transparent"
             w="100%"
             flex={1}
             borderRadius="xl"
             overflowY="hidden"
-            backdropFilter="blur(10px)"
-            boxShadow="inset 0 0 20px rgba(255,255,255,0.5)"
           >
             {loading ? (
               <Spinner
@@ -410,22 +431,153 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <></>
               )}
               <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message.."
+                variant="unstyled"
+                bg="#F3F4F6"
+                border="1px solid #E5E7EB"
+                borderRadius="full"
+                px={5}
+                py={3}
+                placeholder="Type your message..."
                 value={newMessage}
                 onChange={typingHandler}
+                _focus={{ bg: "white", borderColor: "#C7D2FE", boxShadow: "0 0 0 2px #E0E7FF" }}
               />
             </FormControl>
           </Box>
         </>
       ) : (
         // to get socket.io on same page
-        <Box d="flex" alignItems="center" justifyContent="center" h="100%">
-          <Text fontSize="3xl" pb={3} fontFamily="Work sans">
-            Click on a user to start chatting
-          </Text>
-        </Box>
+          <Box d="flex" alignItems="center" justifyContent="center" h="100%" p={{ base: 4, md: 10 }}>
+            <Box
+              w="100%"
+              maxW="560px"
+              bg="white"
+              borderRadius="24px"
+              p={{ base: 6, md: 8 }}
+              boxShadow="0 18px 40px rgba(17,24,39,0.08)"
+              border="1px solid #EEF2FF"
+              textAlign="center"
+            >
+              <Box
+                w="120px"
+                h="120px"
+                mx="auto"
+                mb={4}
+                borderRadius="full"
+                bg="linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #22D3EE 100%)"
+                d="flex"
+                alignItems="center"
+                justifyContent="center"
+                boxShadow="0 12px 24px rgba(99,102,241,0.25)"
+              >
+                <Box
+                  w="64px"
+                  h="46px"
+                  bg="white"
+                  borderRadius="18px"
+                  d="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 8px 18px rgba(17,24,39,0.12)"
+                >
+                  <HStack spacing={2}>
+                    <Box w="8px" h="8px" bg="#6366F1" borderRadius="full" />
+                    <Box w="8px" h="8px" bg="#A855F7" borderRadius="full" />
+                    <Box w="8px" h="8px" bg="#22D3EE" borderRadius="full" />
+                  </HStack>
+                </Box>
+              </Box>
+              <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="700" color="#111827">
+                Welcome to <Text as="span" color="#4F46E5">SmartConvo</Text>
+              </Text>
+              <Text fontSize="sm" color="#6B7280" mt={2}>
+                Your intelligent chat companion for conversations, summaries, and quick expense splitting.
+              </Text>
+
+              <Box
+                mt={6}
+                bg="#F8FAFF"
+                border="1px solid #EEF2FF"
+                borderRadius="16px"
+                p={4}
+                textAlign="left"
+              >
+                <Text fontSize="sm" fontWeight="600" color="#4338CA" mb={3}>
+                  Try these features:
+                </Text>
+                <VStack spacing={3} align="stretch">
+                  <HStack align="start" spacing={3}>
+                    <Box
+                      w="28px"
+                      h="28px"
+                      borderRadius="full"
+                      bg="#E0E7FF"
+                      d="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      color="#4338CA"
+                    >
+                      <i className="fas fa-paper-plane"></i>
+                    </Box>
+                    <Text fontSize="sm" color="#374151">
+                      Send a message to start a conversation
+                    </Text>
+                  </HStack>
+                  <HStack align="start" spacing={3}>
+                    <Box
+                      w="28px"
+                      h="28px"
+                      borderRadius="full"
+                      bg="#E0E7FF"
+                      d="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      color="#4338CA"
+                    >
+                      <i className="fas fa-magic"></i>
+                    </Box>
+                    <Text fontSize="sm" color="#374151">
+                      Summarize chats to capture key points
+                    </Text>
+                  </HStack>
+                  <HStack align="start" spacing={3}>
+                    <Box
+                      w="28px"
+                      h="28px"
+                      borderRadius="full"
+                      bg="#E0E7FF"
+                      d="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      color="#4338CA"
+                    >
+                      <i className="fas fa-calendar-check"></i>
+                    </Box>
+                    <Text fontSize="sm" color="#374151">
+                      Track deadlines and reminders
+                    </Text>
+                  </HStack>
+                  <HStack align="start" spacing={3}>
+                    <Box
+                      w="28px"
+                      h="28px"
+                      borderRadius="full"
+                      bg="#E0E7FF"
+                      d="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      color="#4338CA"
+                    >
+                      <i className="fas fa-coins"></i>
+                    </Box>
+                    <Text fontSize="sm" color="#374151">
+                      Split expenses with your groups
+                    </Text>
+                  </HStack>
+                </VStack>
+              </Box>
+            </Box>
+          </Box>
       )}
       <SummarizeModal isOpen={isSummarizeOpen} onClose={onSummarizeClose} summary={summary} loading={summarizeLoading} />
     </>
