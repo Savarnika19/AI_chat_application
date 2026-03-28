@@ -39,7 +39,9 @@ const ScrollableChat = ({
     <ScrollableFeed>
       <AnimatePresence>
         {messages &&
-          messages.map((m, i) => (
+          messages
+            .filter((m) => !m.content?.startsWith("[SUMMARY]"))
+            .map((m, i) => (
             <motion.div
               style={{ display: "flex" }}
               key={m._id}
@@ -60,6 +62,7 @@ const ScrollableChat = ({
                     />
                   </Tooltip>
                 )}
+
               <span
                 id={`msg-${m._id}`}
                 style={{

@@ -1,6 +1,6 @@
-import { Box, Button, Text, VStack, Spinner, Input, FormControl, FormLabel, useToast, HStack } from "@chakra-ui/react";
+import { Box, Button, Text, VStack, Spinner, Input, FormControl, useToast, HStack } from "@chakra-ui/react";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { ChatState } from "../Context/ChatProvider";
 
@@ -15,8 +15,12 @@ const ExpenseGroupPage = () => {
   const [submittingId, setSubmittingId] = useState(null);
   const [calculating, setCalculating] = useState(false);
   const [amounts, setAmounts] = useState({});
+  const canDelete = group?.createdBy?._id
+    ? group.createdBy._id.toString() === user?._id?.toString()
+    : group?.createdBy?.toString() === user?._id?.toString();
 
-  const fetchGroup = async () => {
+  const fetchGroup = useCallback(async () => {
+    if (!user || !user.token) return;
     try {
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       const { data } = await axios.get(`/api/expenses/${groupId}`, config);
@@ -26,11 +30,11 @@ const ExpenseGroupPage = () => {
       toast({ title: "Error fetching group", status: "error", duration: 3000, isClosable: true });
       setLoading(false);
     }
-  };
+  }, [groupId, user, toast]);
 
   useEffect(() => {
     fetchGroup();
-  }, [groupId]);
+  }, [fetchGroup]);
 
   const handleSavePayment = async (targetUserId) => {
     const amount = amounts[targetUserId];
@@ -69,12 +73,37 @@ const ExpenseGroupPage = () => {
     }
   };
 
+  const handleDeleteGroup = async () => {
+    if (!window.confirm("Delete this expense group? This cannot be undone.")) return;
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.delete(`/api/expenses/${groupId}`, config);
+      toast({ title: "Expense group deleted", status: "success", duration: 3000, isClosable: true });
+      history.push("/expenses");
+    } catch (error) {
+      toast({
+        title: "Error deleting group",
+        description: error.response?.data?.message || error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   if (loading || !group) return <Spinner size="xl" d="block" mx="auto" my={20} />;
 
   return (
     <Box p={6} mt={4} maxW="container.md" mx="auto" bg="white" borderRadius="lg" borderWidth="1px">
-      <Button mb={4} onClick={() => history.push("/expenses")}>Back to Dashboard</Button>
-      <Text fontSize="3xl" mb={4} textAlign="center">Shared Expense Workspace</Text>
+      <HStack spacing={3} mb={4}>
+        <Button onClick={() => history.push("/expenses")}>Back to Dashboard</Button>
+        {canDelete && (
+          <Button colorScheme="red" variant="outline" onClick={handleDeleteGroup}>
+            Delete Group
+          </Button>
+        )}
+      </HStack>
+      <Text fontSize="3xl" mb={4} textAlign="center">Shared Expense Group</Text>
       
       {group.status === "active" ? (
         <VStack spacing={4} align="stretch" mb={6}>

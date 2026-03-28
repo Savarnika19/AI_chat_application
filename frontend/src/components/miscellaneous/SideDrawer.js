@@ -62,10 +62,10 @@ function SideDrawer() {
     if (user) {
       fetchDbNotifications();
     }
-  }, [user]);
+  }, [user, setDbNotifications]);
 
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onClose } = useDisclosure();
   const { isOpen: isDeadlineOpen, onOpen: onDeadlineOpen, onClose: onDeadlineClose } = useDisclosure();
   const history = useHistory();
 
@@ -142,131 +142,168 @@ function SideDrawer() {
 
   return (
     <>
-      <Box
-        d="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        bg="white"
-        w="100%"
-        p="5px 10px 5px 10px"
-        borderWidth="5px"
-      >
-        <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
-          <Button variant="ghost" onClick={onOpen}>
-            <i className="fas fa-search"></i>
-            <Text d={{ base: "none", md: "flex" }} px={4}>
-              Search User
+      <Box position="sticky" top="0" zIndex="10" w="100%" py={3}>
+        <Box
+          d="flex"
+          alignItems="center"
+          bg="white"
+          w="100%"
+          px={{ base: 3, md: 5 }}
+          py={3}
+          borderRadius="16px"
+          boxShadow="0 10px 24px rgba(17,24,39,0.08)"
+        >
+          <Box d="flex" alignItems="center" gap={3} minW="170px">
+            <Box
+              w="36px"
+              h="36px"
+              borderRadius="12px"
+              bg="linear-gradient(135deg, #6366F1 0%, #22D3EE 100%)"
+              d="flex"
+              alignItems="center"
+              justifyContent="center"
+              color="white"
+            >
+              <i className="fas fa-comment-dots"></i>
+            </Box>
+            <Text fontSize="lg" fontWeight="700" fontFamily="Outfit">
+              SmartConvo
             </Text>
-          </Button>
-        </Tooltip>
+          </Box>
+          <Box flex="1" />
 
-        <Tooltip label="Deadlines Tracker" hasArrow placement="bottom">
-          <Button variant="ghost" onClick={onDeadlineOpen}>
-            <Text fontSize="2xl">⏰</Text>
-          </Button>
-        </Tooltip>
+          <Box d="flex" alignItems="center" gap={2}>
+            <Tooltip label="Deadlines Tracker" hasArrow placement="bottom">
+              <Button
+                variant="ghost"
+                onClick={onDeadlineOpen}
+                borderRadius="full"
+                transition="all 0.2s ease"
+                _hover={{ bg: "#EEF2FF", transform: "scale(1.05)" }}
+              >
+                <i className="fas fa-calendar-check"></i>
+              </Button>
+            </Tooltip>
 
-        <Tooltip label="Expense Dashboard" hasArrow placement="bottom">
-          <Button variant="ghost" onClick={() => history.push("/expenses")}>
-            <Text fontSize="2xl">💸</Text>
-          </Button>
-        </Tooltip>
+            <Tooltip label="Expense Dashboard" hasArrow placement="bottom">
+              <Button
+                onClick={() => history.push("/expenses")}
+                bg="#EEF2FF"
+                color="#4338CA"
+                borderRadius="full"
+                px={4}
+                fontWeight="600"
+                fontSize="sm"
+                transition="all 0.2s ease"
+                _hover={{ bg: "#E0E7FF" }}
+              >
+                <i className="fas fa-coins" style={{ marginRight: 8 }}></i>
+                Expense Splitter
+              </Button>
+            </Tooltip>
 
-        <Text fontSize="2xl" fontFamily="Work sans">
-          Talk-A-Tive
-        </Text>
-        <div>
-          <Menu>
-            <MenuButton p={1}>
-              <Box position="relative" display="inline-block">
-                <BellIcon fontSize="2xl" m={1} />
-                {(notification.length + dbNotifications.length) > 0 && (
-                  <Box
-                    color="white"
-                    bg="red"
-                    borderRadius="full"
-                    position="absolute"
-                    top="-2px"
-                    right="0"
-                    fontSize="xs"
-                    w="18px"
-                    h="18px"
-                    d="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    {notification.length + dbNotifications.length}
-                  </Box>
-                )}
-              </Box>
-            </MenuButton>
-            <MenuList pl={2}>
-              {!notification.length && !dbNotifications.length && "No Notifications"}
-              {notification.map((notif) => (
-                <MenuItem
-                  key={notif._id}
-                  onClick={() => {
-                    if (notif.type === "expense_created" || notif.type === "expense_settlement") {
-                      const groupId = notif.expenseGroup?._id || notif.expenseGroup;
-                      history.push(`/expenses/${groupId}`);
-                    } else if (notif.chat) {
-                      setSelectedChat(notif.chat);
-                    }
-                    setNotification(notification.filter((n) => n._id !== notif._id));
-                  }}
-                >
-                  {notif.type && notif.type.startsWith("expense_") ? (
-                    <><Text as="span" fontWeight="bold" mr={2}>💸</Text> {notif.message}</>
-                  ) : notif.chat?.isGroupChat ? (
-                    `New Message in ${notif.chat.chatName}`
-                  ) : (
-                    `New Message from ${getSender(user, notif.chat?.users)}`
+            <Menu>
+              <MenuButton p={1}>
+                <Box position="relative" display="inline-block">
+                  <BellIcon fontSize="2xl" m={1} />
+                  {(notification.length + dbNotifications.length) > 0 && (
+                    <Box
+                      color="white"
+                      bg="#EF4444"
+                      borderRadius="full"
+                      border="2px solid #FFFFFF"
+                      boxShadow="0 2px 6px rgba(0,0,0,0.12)"
+                      position="absolute"
+                      top="-2px"
+                      right="-2px"
+                      fontSize="xs"
+                      w="18px"
+                      h="18px"
+                      d="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      {notification.length + dbNotifications.length}
+                    </Box>
                   )}
-                </MenuItem>
-              ))}
-              {dbNotifications.map((notif) => (
-                <MenuItem
-                  key={notif._id}
-                  onClick={async () => {
-                    try {
-                      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-                      await axios.patch(`/api/notifications/${notif._id}`, {}, config);
-                      setDbNotifications(dbNotifications.filter((n) => n._id !== notif._id));
-                      setNotification(notification.filter((n) => n._id !== notif._id));
-                      
-                      // Handling logic for opening Expense View
+                </Box>
+              </MenuButton>
+              <MenuList pl={2}>
+                {!notification.length && !dbNotifications.length && "No Notifications"}
+                {notification.map((notif) => (
+                  <MenuItem
+                    key={notif._id}
+                    onClick={() => {
                       if (notif.type === "expense_created" || notif.type === "expense_settlement") {
                         const groupId = notif.expenseGroup?._id || notif.expenseGroup;
                         history.push(`/expenses/${groupId}`);
+                      } else if (notif.chat) {
+                        setSelectedChat(notif.chat);
                       }
-                    } catch (error) {
-                      console.log(error);
-                    }
-                  }}
-                >
-                  <Text as="span" fontWeight="bold" mr={2}>💸</Text> {notif.message}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-          <Menu>
-            <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
-              <Avatar
-                size="sm"
-                cursor="pointer"
-                name={user.name}
-                src={user.pic}
-              />
-            </MenuButton>
-            <MenuList>
-              <ProfileModal user={user}>
-                <MenuItem>My Profile</MenuItem>{" "}
-              </ProfileModal>
-              <MenuDivider />
-              <MenuItem onClick={logoutHandler}>Logout</MenuItem>
-            </MenuList>
-          </Menu>
-        </div>
+                      setNotification(notification.filter((n) => n._id !== notif._id));
+                    }}
+                  >
+                    {notif.type && notif.type.startsWith("expense_") ? (
+                      <><Text as="span" fontWeight="bold" mr={2}><i className="fas fa-coins"></i></Text> {notif.message}</>
+                    ) : notif.chat?.isGroupChat ? (
+                      `New Message in ${notif.chat.chatName}`
+                    ) : (
+                      `New Message from ${getSender(user, notif.chat?.users)}`
+                    )}
+                  </MenuItem>
+                ))}
+                {dbNotifications.map((notif) => (
+                  <MenuItem
+                    key={notif._id}
+                    onClick={async () => {
+                      try {
+                        const config = { headers: { Authorization: `Bearer ${user.token}` } };
+                        await axios.patch(`/api/notifications/${notif._id}`, {}, config);
+                        setDbNotifications(dbNotifications.filter((n) => n._id !== notif._id));
+                        setNotification(notification.filter((n) => n._id !== notif._id));
+
+                        // Handling logic for opening Expense View
+                        if (notif.type === "expense_created" || notif.type === "expense_settlement") {
+                          const groupId = notif.expenseGroup?._id || notif.expenseGroup;
+                          history.push(`/expenses/${groupId}`);
+                        }
+                      } catch (error) {
+                        console.log(error);
+                      }
+                    }}
+                  >
+                    <Text as="span" fontWeight="bold" mr={2}><i className="fas fa-coins"></i></Text> {notif.message}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            <Menu>
+              <MenuButton
+                as={Button}
+                bg="white"
+                rightIcon={<ChevronDownIcon />}
+                borderRadius="full"
+                transition="all 0.2s ease"
+                _hover={{ bg: "#EEF2FF", transform: "scale(1.02)" }}
+              >
+                <Avatar
+                  size="sm"
+                  cursor="pointer"
+                  name={user.name}
+                  src={user.pic}
+                />
+              </MenuButton>
+              <MenuList>
+                <ProfileModal user={user}>
+                  <MenuItem>My Profile</MenuItem>{" "}
+                </ProfileModal>
+                <MenuDivider />
+                <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+              </MenuList>
+            </Menu>
+          </Box>
+        </Box>
       </Box>
 
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
@@ -304,3 +341,5 @@ function SideDrawer() {
 }
 
 export default SideDrawer;
+
+

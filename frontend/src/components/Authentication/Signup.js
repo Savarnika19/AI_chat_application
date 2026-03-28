@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/button";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
-import { VStack } from "@chakra-ui/layout";
+import { VStack, Box, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useState } from "react";
@@ -145,35 +145,46 @@ const Signup = () => {
   };
 
   return (
-    <VStack spacing="5px">
+    <VStack spacing="10px" align="stretch">
+      <Box>
+        <Text fontSize="xl" fontWeight="600" color="gray.700" mb={1}>
+          Create your account
+        </Text>
+        <Text fontSize="sm" color="gray.500">
+          Join SmartConvo in just a minute.
+        </Text>
+      </Box>
       <FormControl id="first-name" isRequired>
-        <FormLabel color="black">Name</FormLabel>
+        <FormLabel color="gray.700">Name</FormLabel>
         <Input
           placeholder="Enter Your Name"
           onChange={(e) => setName(e.target.value)}
           bg="white"
-          borderColor="gray.300"
+          borderColor="gray.200"
+          _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #63B3ED" }}
         />
       </FormControl>
       <FormControl id="email" isRequired>
-        <FormLabel color="black">Email Address</FormLabel>
+        <FormLabel color="gray.700">Email Address</FormLabel>
         <Input
           type="email"
           placeholder="Enter Your Email Address"
           onChange={(e) => setEmail(e.target.value)}
           bg="white"
-          borderColor="gray.300"
+          borderColor="gray.200"
+          _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #63B3ED" }}
         />
       </FormControl>
       <FormControl id="password" isRequired>
-        <FormLabel color="black">Password</FormLabel>
+        <FormLabel color="gray.700">Password</FormLabel>
         <InputGroup size="md">
           <Input
             type={show ? "text" : "password"}
             placeholder="Enter Password"
             onChange={(e) => setPassword(e.target.value)}
             bg="white"
-            borderColor="gray.300"
+            borderColor="gray.200"
+            _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #63B3ED" }}
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick} variant="ghost">
@@ -183,14 +194,15 @@ const Signup = () => {
         </InputGroup>
       </FormControl>
       <FormControl id="password" isRequired>
-        <FormLabel color="black">Confirm Password</FormLabel>
+        <FormLabel color="gray.700">Confirm Password</FormLabel>
         <InputGroup size="md">
           <Input
             type={show ? "text" : "password"}
             placeholder="Confirm password"
             onChange={(e) => setConfirmpassword(e.target.value)}
             bg="white"
-            borderColor="gray.300"
+            borderColor="gray.200"
+            _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #63B3ED" }}
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick} variant="ghost">
@@ -200,25 +212,25 @@ const Signup = () => {
         </InputGroup>
       </FormControl>
       <FormControl id="pic">
-        <FormLabel color="black">Upload your Picture</FormLabel>
+        <FormLabel color="gray.700">Upload your Picture</FormLabel>
         <Input
           type="file"
           p={1.5}
           accept="image/*"
           onChange={(e) => postDetails(e.target.files[0])}
           bg="white"
-          borderColor="gray.300"
+          borderColor="gray.200"
         />
       </FormControl>
       <Button
-        colorScheme="purple"
+        colorScheme="blue"
         width="100%"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={picLoading}
-        bgGradient="linear(to-r, purple.400, pink.400)"
+        bgGradient="linear(to-r, #2B6CB0, #3182CE)"
         _hover={{
-          bgGradient: "linear(to-r, purple.500, pink.500)",
+          bgGradient: "linear(to-r, #2C5282, #2B6CB0)",
           transform: "scale(1.02)",
         }}
       >
