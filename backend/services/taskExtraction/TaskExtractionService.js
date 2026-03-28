@@ -1,3 +1,4 @@
+const nlp = require("compromise");
 const chrono = require("chrono-node");
 const { normalizeDateText } = require("./DateNormalizer");
 const Deadline = require("../../models/deadlineModel");
@@ -17,10 +18,24 @@ if (process.env.GEMINI_API_KEY) {
 }
 
 // Triggers
-const STRONG_TRIGGERS = ["submit", "prepare", "complete", "finish", "deploy", "upload", "send", "review", "update", "deliver", "cheyali", "cheyyali", "ivvali", "pampali"];
-const SOFT_TRIGGERS = ["please", "expected to", "kindly", "remember to"];
+const strongTriggers = [
+  "submit", "prepare", "complete", "finish", "deploy",
+  "upload", "send", "update", "fix", "check",
+  "review", "implement", "create", "build",
+  "present", "attend", "join", "discuss", "meet",
+  "cheyali", "cheyyali", "ivvali", "pampali"
+];
+
+const patterns = [
+  /will\s+\w+/i,
+  /should\s+\w+/i,
+  /need to\s+\w+/i,
+  /have to\s+\w+/i,
+  /please\s+\w+/i,
+  /let'?s\s+\w+/i
+];
+
 const URGENCY_KW = ["urgent", "asap", "immediately", "priority"];
-const IGNORE_PHRASES = ["see you", "maybe", "ok", "yes", "hi", "hello", "thanks", "thank you", "good morning", "good evening", "good night", "bye", "see ya", "take care", "how are you", "what's up", "nice", "great", "awesome", "cool"];
 
 const CLEANUP_PHRASES = [
     "we also planned to", "we plan to", "we need to", "i will", "we will", "he will", "she will", 
@@ -33,6 +48,26 @@ const preNormalizeMessage = (text) => {
     normalized = normalized.replace(/\brepu\b/gi, "tomorrow");
     normalized = normalized.replace(/\bellundi\b/gi, "day after tomorrow");
     return normalized;
+};
+
+const hasVerb = (text) => {
+  return nlp(text).verbs().out("array").length > 0;
+};
+
+const hasPattern = (text) => {
+  return patterns.some(p => p.test(text));
+};
+
+const isInvalid = (text) => {
+  const lower = text.toLowerCase().trim();
+  return (
+    lower.includes("going to") ||
+    lower.startsWith("are ") ||
+    lower.startsWith("is ") ||
+    lower.startsWith("hello") ||
+    lower.startsWith("hi") ||
+    lower.includes("see you")
+  );
 };
 
 // Service
@@ -55,18 +90,30 @@ const TaskExtractionService = {
                 console.log("SEGMENT DETECTED:", segment);
                 const wordCount = getWordCount(segment);
 
-                // 3. Strict Task Validation (Must contain trigger verb)
-                const hasStrongTrigger = checkTriggers(segment, STRONG_TRIGGERS);
-                if (!hasStrongTrigger || wordCount < 3) continue; // Reject invalid/broken sentences
-
-                // Ignore casual phrases
-                if (IGNORE_PHRASES.some(p => segment.toLowerCase().includes(p))) {
+                // 3. Preprocessing & Reject Invalid
+                if (isInvalid(segment)) {
                     continue;
                 }
 
+                // 4. NLP & Hybrid Decision Pipeline
+                const hasStrongTrigger = checkTriggers(segment, strongTriggers);
+                const hasVerbMatch = hasVerb(segment);
+                const hasPatternMatch = hasPattern(segment);
+                
+                let { date } = parseDate(segment);
+                const hasDateMatch = !!date;
+
+                const isTask =
+                  hasStrongTrigger ||
+                  (hasVerbMatch && hasPatternMatch) ||
+                  (hasDateMatch && hasVerbMatch);
+
+                // Only evaluate valid tasks longer than 1 word
+                if (!isTask || wordCount < 2) continue;
+
                 console.log("TASK CANDIDATE (VALID):", segment);
 
-                let { date } = parseDate(segment);
+                // Re-assigning let date isn't needed here any longer since it's already extracted
 
                 // 4. Responsibility
                 let assignedTo = await extractResponsibility(segment, message.sender, chatId);
@@ -151,8 +198,8 @@ const safeSegment = (text) => {
         if (andParts.length > 1) {
             let currentClause = andParts[0];
             for (let i = 1; i < andParts.length; i++) {
-                const leftHasVerb = checkTriggers(currentClause, STRONG_TRIGGERS);
-                const rightHasVerb = checkTriggers(andParts[i], STRONG_TRIGGERS);
+                const leftHasVerb = checkTriggers(currentClause, strongTriggers);
+                const rightHasVerb = checkTriggers(andParts[i], strongTriggers);
                 
                 if (leftHasVerb && rightHasVerb) {
                     finalSegments.push(currentClause.trim());

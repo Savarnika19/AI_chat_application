@@ -1,0 +1,7 @@
+2026-03-28T13:18:24.952Z Gemini Aggregation Failed: All extractions failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent: [503 Service Unavailable] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+Error: All extractions failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent: [503 Service Unavailable] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+    at D:\Downloads\mern-chat-app\backend\services\geminiSummarizer.js:302:23
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async summarize (D:\Downloads\mern-chat-app\backend\services\geminiSummarizer.js:330:16)
+    at async D:\Downloads\mern-chat-app\backend\controllers\messageControllers-Savarnika.js:102:25
+

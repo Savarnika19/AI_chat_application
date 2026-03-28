@@ -20,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "chrono-node": "^2.9.0",
     "colors": "^1.4.0",
+    "compromise": "^14.15.0",
     "cors": "^2.8.6",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
